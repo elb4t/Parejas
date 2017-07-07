@@ -288,8 +288,9 @@ public class Juego extends Activity {
                 snapshot.getSnapshotContents().writeBytes(datosPartidaGuardada);
                 Date d = new Date();
                 SnapshotMetadataChange metadataChange =
-                        new SnapshotMetadataChange.Builder().fromMetadata(snapshot.getMetadata()).setDescription("Parejas " + DateFormat.format("yyyy.MM.dd",
-                                d.getTime()).toString())
+                        new SnapshotMetadataChange.Builder()
+                                .fromMetadata(snapshot.getMetadata())
+                                .setDescription("Parejas " + DateFormat.format("yyyy.MM.dd", d.getTime()).toString())
                                 .build();
                 Snapshots.CommitSnapshotResult commit = Games.Snapshots.commitAndClose(
                         Partida.mGoogleApiClient, snapshot, metadataChange).await();
@@ -307,8 +308,12 @@ public class Juego extends Activity {
     }
 
     void codificaPartidaGuardada() {
-        datosPartidaGuardada = new byte[Partida.FILAS * Partida.COLUMNAS];
-        int k = 0;
+        datosPartidaGuardada = new byte[(Partida.FILAS * Partida.COLUMNAS)+3];
+        datosPartidaGuardada[0] = (byte) Partida.turno;
+        datosPartidaGuardada[1] = (byte) Partida.puntosJ1;
+        datosPartidaGuardada[2] = (byte) Partida.puntosJ2;
+
+        int k = 3;
         for (int i = 0; i < Partida.FILAS; i++) {
             for (int j = 0; j < Partida.COLUMNAS; j++) {
                 datosPartidaGuardada[k] = (byte) Partida.casillas[i][j];
@@ -320,7 +325,12 @@ public class Juego extends Activity {
     void decodificaPartidaGuardada() {
         int i = 0;
         int j = 0;
-        for (int k = 0; k < Partida.FILAS * Partida.COLUMNAS; k++) {
+
+        Partida.turno = (int) datosPartidaGuardada[0];
+        Partida.puntosJ1 = (int) datosPartidaGuardada[1];
+        Partida.puntosJ2 = (int) datosPartidaGuardada[2];
+
+        for (int k = 3; k < (Partida.FILAS * Partida.COLUMNAS)+3; k++) {
             Partida.casillas[i][j] = (int) datosPartidaGuardada[k];
             if (j < Partida.COLUMNAS - 1) {
                 j++;
