@@ -8,16 +8,25 @@
         android:id="@+id/sign_in_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/sign_out_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Desconectar"
         android:visibility="gone" />
+
     <Button
         android:id="@+id/btnJugar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="btnJugar_Click"
         android:text="Jugar" />
+
+    <Button
+        android:id="@+id/btnPartidasGuardadas"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnPartidasGuardadas_Click"
+        android:text="Partidas guardadas" />
 </LinearLayout>

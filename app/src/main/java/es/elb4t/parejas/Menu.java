@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     private boolean mSignInClicked = false;
     private com.google.android.gms.common.SignInButton btnConectar;
     private Button btnDesconectar;
+    private Button btnPartidasGuardadas;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,11 +41,14 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         btnConectar.setOnClickListener(btnConectar_Click);
         btnDesconectar = (Button) findViewById(R.id.sign_out_button);
         btnDesconectar.setOnClickListener(btnDesconectar_Click);
+        btnPartidasGuardadas = (Button) findViewById(R.id.btnPartidasGuardadas);
         Partida.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API)
                 .addScope(Games.SCOPE_GAMES)
+                .addApi(Drive.API)
+                .addScope(Drive.SCOPE_APPFOLDER)
                 .build();
         SharedPreferences prefs = getSharedPreferences("Parejas", MODE_PRIVATE);
         int conectado = prefs.getInt("conectado", 0);
@@ -77,6 +82,13 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
             editor.commit();
         }
     };
+
+    public void btnPartidasGuardadas_Click(View v) {
+        Partida.tipoPartida = "GUARDADA";
+        nuevoJuego(4, 4);
+        Intent intent = new Intent(this, Juego.class);
+        startActivity(intent);
+    }
 
     private void nuevoJuego(int col, int fil) {
         Partida.turno = 1;
@@ -134,7 +146,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     @Override
     public void onActivityResult(int requestCode, int responseCode, Intent intent) {
         super.onActivityResult(requestCode, responseCode, intent);
-        Log.e("PAREJAS","activity result:---  "+responseCode);
+        Log.e("PAREJAS", "activity result:---  " + responseCode);
         switch (requestCode) {
             case RC_SIGN_IN:
                 mSignInClicked = false;

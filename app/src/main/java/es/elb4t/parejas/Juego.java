@@ -2,6 +2,7 @@ package es.elb4t.parejas;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +14,8 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.google.android.gms.games.Games;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,7 @@ public class Juego extends Activity {
     private static Object lock = new Object();
     private Button[][] botones;
     private ButtonListener btnCasilla_Click;
+    private static final int RC_SAVED_GAMES = 9009;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,9 @@ public class Juego extends Activity {
         switch (Partida.tipoPartida) {
             case "LOCAL":
                 mostrarTablero();
+                break;
+            case "GUARDADA":
+                mostrarPartidasGuardadas();
                 break;
         }
     }
@@ -191,5 +198,13 @@ public class Juego extends Activity {
         button.setOnClickListener(btnCasilla_Click);
         botones[x][y] = button;
         return button;
+    }
+
+    private void mostrarPartidasGuardadas() {
+        int maxNumberOfSavedGamesToShow = 5;
+        Intent savedGamesIntent =
+                Games.Snapshots.getSelectSnapshotIntent(Partida.mGoogleApiClient,
+                        "Partidas guardadas", true, true, maxNumberOfSavedGamesToShow);
+        startActivityForResult(savedGamesIntent, RC_SAVED_GAMES);
     }
 }
