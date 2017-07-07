@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -15,10 +17,17 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.snapshot.Snapshot;
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
+import com.google.android.gms.games.snapshot.Snapshots;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,6 +48,9 @@ public class Juego extends Activity {
     private Button[][] botones;
     private ButtonListener btnCasilla_Click;
     private static final int RC_SAVED_GAMES = 9009;
+
+    String PartidaGuardadaNombre;
+    private byte[] datosPartidaGuardada;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,5 +218,124 @@ public class Juego extends Activity {
                 Games.Snapshots.getSelectSnapshotIntent(Partida.mGoogleApiClient,
                         "Partidas guardadas", true, true, maxNumberOfSavedGamesToShow);
         startActivityForResult(savedGamesIntent, RC_SAVED_GAMES);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int responseCode, Intent intent) {
+        super.onActivityResult(requestCode, responseCode, intent);
+        switch (requestCode) {
+            case RC_SAVED_GAMES:
+                if (intent != null) {
+                    if (intent.hasExtra(Snapshots.EXTRA_SNAPSHOT_NEW)) {
+                        nuevoSnapshotPartidaGuadada();
+                    }
+                } else {
+                    finish();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, responseCode, intent);
+    }
+
+    void nuevoSnapshotPartidaGuadada() {
+        AsyncTask<Void, Void, Integer> task = new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                String unique = new BigInteger(281, new Random()).toString(13);
+                PartidaGuardadaNombre = "Parejas-" + unique;
+                Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
+                        Partida.mGoogleApiClient, PartidaGuardadaNombre, true).await();
+                if (!open.getStatus().isSuccess()) {
+                    return 0;
+                }
+                codificaPartidaGuardada();
+                Snapshot snapshot = open.getSnapshot();
+                snapshot.getSnapshotContents().writeBytes(datosPartidaGuardada);
+                Date d = new Date();
+                SnapshotMetadataChange metadataChange =
+                        new SnapshotMetadataChange.Builder().fromMetadata(snapshot.getMetadata()).setDescription("Parejas " + DateFormat.format("yyyy.MM.dd",
+                                d.getTime()).toString())
+                                .build();
+                Snapshots.CommitSnapshotResult commit = Games.Snapshots.commitAndClose(
+                        Partida.mGoogleApiClient, snapshot, metadataChange).await();
+                return -1;
+            }
+
+            @Override
+            protected void onPostExecute(Integer status) {
+                if (status == -1) {
+                    mostrarTablero();
+                }
+            }
+        };
+        task.execute();
+    }
+
+    void codificaPartidaGuardada() {
+        datosPartidaGuardada = new byte[Partida.FILAS * Partida.COLUMNAS];
+        int k = 0;
+        for (int i = 0; i < Partida.FILAS; i++) {
+            for (int j = 0; j < Partida.COLUMNAS; j++) {
+                datosPartidaGuardada[k] = (byte) Partida.casillas[i][j];
+                k++;
+            }
+        }
+    }
+
+    void decodificaPartidaGuardada() {
+        int i = 0;
+        int j = 0;
+        for (int k = 0; k < Partida.FILAS * Partida.COLUMNAS; k++) {
+            Partida.casillas[i][j] = (int) datosPartidaGuardada[k];
+            if (j < Partida.COLUMNAS - 1) {
+                j++;
+            } else {
+                j = 0;
+                if (i < Partida.FILAS - 1) {
+                    i++;
+                } else {
+                    i = 0;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (Partida.tipoPartida == "GUARDADA") {
+            guardarPartidaGuardada();
+        }
+        Juego.this.finish();
+    }
+
+    public void guardarPartidaGuardada() {
+        codificaPartidaGuardada();
+        AsyncTask<Void, Void, Integer> task = new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
+                        Partida.mGoogleApiClient, PartidaGuardadaNombre, false).await();
+                if (open.getStatus().isSuccess()) {
+                    Snapshot snapshot = open.getSnapshot();
+                    guardarSnapshotPartidaGuardada(snapshot, datosPartidaGuardada,
+                            "Partida de Parejas");
+                    return 1;
+                }
+                return 0;
+            }
+
+            @Override
+            protected void onPostExecute(Integer status) {
+            }
+        };
+        task.execute();
+    }
+
+    private PendingResult<Snapshots.CommitSnapshotResult> guardarSnapshotPartidaGuardada(Snapshot snapshot, byte[] data, String desc) {
+        snapshot.getSnapshotContents().writeBytes(data);
+        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
+                .setDescription(desc)
+                .build();
+        return Games.Snapshots.commitAndClose(Partida.mGoogleApiClient, snapshot, metadataChange);
     }
 }
