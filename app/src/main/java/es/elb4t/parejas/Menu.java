@@ -31,6 +31,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     private com.google.android.gms.common.SignInButton btnConectar;
     private Button btnDesconectar;
     private Button btnPartidasGuardadas;
+    private Button btnPartidaEnTiempoReal;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         btnDesconectar = (Button) findViewById(R.id.sign_out_button);
         btnDesconectar.setOnClickListener(btnDesconectar_Click);
         btnPartidasGuardadas = (Button) findViewById(R.id.btnPartidasGuardadas);
+        btnPartidaEnTiempoReal = (Button) findViewById(R.id.btnPartidaEnTiempoReal);
         Partida.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -85,6 +87,13 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
 
     public void btnPartidasGuardadas_Click(View v) {
         Partida.tipoPartida = "GUARDADA";
+        nuevoJuego(4, 4);
+        Intent intent = new Intent(this, Juego.class);
+        startActivity(intent);
+    }
+
+    public void btnPartidaEnTiempoReal_Click(View v) {
+        Partida.tipoPartida = "REAL";
         nuevoJuego(4, 4);
         Intent intent = new Intent(this, Juego.class);
         startActivity(intent);

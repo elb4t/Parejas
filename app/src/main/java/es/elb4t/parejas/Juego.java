@@ -19,6 +19,14 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
+import com.google.android.gms.games.multiplayer.realtime.Room;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
+import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotMetadata;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
@@ -37,7 +45,9 @@ import java.util.TimerTask;
  * Created by eloy on 6/7/17.
  */
 
-public class Juego extends Activity {
+public class Juego extends Activity implements RoomStatusUpdateListener,
+        RoomUpdateListener,
+        RealTimeMessageReceivedListener {
     private Drawable imagenOculta;
     private List<Drawable> imagenes;
     private Casilla primeraCasilla;
@@ -50,6 +60,12 @@ public class Juego extends Activity {
     private Button[][] botones;
     private ButtonListener btnCasilla_Click;
     private static final int RC_SAVED_GAMES = 9009;
+
+    String mRoomId = null;
+    ArrayList<Participant> mParticipants = null;
+    String mMyId = null;
+    final static int RC_WAITING_ROOM = 10002;
+    int jugadorLocal = 1;
 
     String PartidaGuardadaNombre;
     private byte[] datosPartidaGuardada;
@@ -69,6 +85,9 @@ public class Juego extends Activity {
                 break;
             case "GUARDADA":
                 mostrarPartidasGuardadas();
+                break;
+            case "REAL":
+                iniciarPartidaEnTiempoReal();
                 break;
         }
     }
@@ -241,6 +260,15 @@ public class Juego extends Activity {
                     finish();
                 }
                 break;
+            case RC_WAITING_ROOM:
+                if (responseCode == Activity.RESULT_OK) {
+                    numeroJugadorLocal();
+                    enviarTableroOponentes();
+                    mostrarTablero();
+                } else {
+                    finish();
+                }
+                break;
         }
         super.onActivityResult(requestCode, responseCode, intent);
     }
@@ -308,7 +336,7 @@ public class Juego extends Activity {
     }
 
     void codificaPartidaGuardada() {
-        datosPartidaGuardada = new byte[(Partida.FILAS * Partida.COLUMNAS)+3];
+        datosPartidaGuardada = new byte[(Partida.FILAS * Partida.COLUMNAS) + 3];
         datosPartidaGuardada[0] = (byte) Partida.turno;
         datosPartidaGuardada[1] = (byte) Partida.puntosJ1;
         datosPartidaGuardada[2] = (byte) Partida.puntosJ2;
@@ -330,7 +358,7 @@ public class Juego extends Activity {
         Partida.puntosJ1 = (int) datosPartidaGuardada[1];
         Partida.puntosJ2 = (int) datosPartidaGuardada[2];
 
-        for (int k = 3; k < (Partida.FILAS * Partida.COLUMNAS)+3; k++) {
+        for (int k = 3; k < (Partida.FILAS * Partida.COLUMNAS) + 3; k++) {
             Partida.casillas[i][j] = (int) datosPartidaGuardada[k];
             if (j < Partida.COLUMNAS - 1) {
                 j++;
@@ -382,5 +410,164 @@ public class Juego extends Activity {
                 .setDescription(desc)
                 .build();
         return Games.Snapshots.commitAndClose(Partida.mGoogleApiClient, snapshot, metadataChange);
+    }
+
+    @Override
+    public void onPeerDeclined(Room room, List<String> arg1) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onP2PDisconnected(String participant) {
+    }
+
+    @Override
+    public void onPeerJoined(Room room, List<String> arg1) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onRoomAutoMatching(Room room) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onPeersConnected(Room room, List<String> peers) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onRoomConnecting(Room room) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onPeerLeft(Room room, List<String> peersWhoLeft) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onDisconnectedFromRoom(Room room) {
+        mRoomId = null;
+        mostrarErrorJuego();
+    }
+
+    @Override
+    public void onPeersDisconnected(Room room, List<String> peers) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onConnectedToRoom(Room room) {
+        mParticipants = room.getParticipants();
+        mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(
+                Partida.mGoogleApiClient));
+        if (mRoomId == null)
+            mRoomId = room.getRoomId();
+    }
+
+    @Override
+    public void onPeerInvitedToRoom(Room room, List<String> arg1) {
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onP2PConnected(String participant) {
+    }
+
+    @Override
+    public void onRoomCreated(int statusCode, Room room) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
+            mostrarErrorJuego();
+            return;
+        }
+        mRoomId = room.getRoomId();
+        mostrarEsperandoARoom(room);
+    }
+
+    @Override
+    public void onLeftRoom(int statusCode, String roomId) {
+    }
+
+    @Override
+    public void onJoinedRoom(int statusCode, Room room) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
+            mostrarErrorJuego();
+            return;
+        }
+        mostrarEsperandoARoom(room);
+    }
+
+    @Override
+    public void onRoomConnected(int statusCode, Room room) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
+            mostrarErrorJuego();
+            return;
+        }
+        actualizaRoom(room);
+    }
+
+    @Override
+    public void onRealTimeMessageReceived(RealTimeMessage rtm) {
+    }
+
+    private void iniciarPartidaEnTiempoReal() {
+        final int NUMERO_MINIMO_OPONENTES = 1, NUMERO_MAXIMO_OPONENTES = 1;
+        Bundle criterioPartidaRapida =
+                RoomConfig.createAutoMatchCriteria(NUMERO_MINIMO_OPONENTES,
+                        NUMERO_MAXIMO_OPONENTES, 0);
+        RoomConfig.Builder roomConfiguradorConstructor = RoomConfig.builder(this);
+        roomConfiguradorConstructor.setMessageReceivedListener(this);
+        roomConfiguradorConstructor.setRoomStatusUpdateListener(this);
+        roomConfiguradorConstructor.setAutoMatchCriteria(criterioPartidaRapida);
+        Games.RealTimeMultiplayer.create(Partida.mGoogleApiClient,
+                roomConfiguradorConstructor.build());
+    }
+
+    private void numeroJugadorLocal() {
+        jugadorLocal = 1;
+        for (Participant p : mParticipants) {
+            if (p.getParticipantId().equals(mMyId)) continue;
+            if (p.getStatus() != Participant.STATUS_JOINED) continue;
+            if (p.getParticipantId().compareTo(mMyId) < 0) jugadorLocal = 2;
+        }
+    }
+
+    public void enviarTableroOponentes() {
+        if (jugadorLocal == 1) {
+            for (int fila = 0; fila < Partida.FILAS; fila++) {
+                for (int columna = 0; columna < Partida.COLUMNAS; columna++) {
+                    byte[] mensaje;
+                    mensaje = new byte[4];
+                    mensaje[0] = (byte) 'A';
+                    mensaje[1] = (byte) fila;
+                    mensaje[2] = (byte) columna;
+                    mensaje[3] = (byte) Partida.casillas[fila][columna];
+                    for (Participant p : mParticipants) {
+                        if (!p.getParticipantId().equals(mMyId)) {
+                            Games.RealTimeMultiplayer.sendReliableMessage(Partida.mGoogleApiClient, null, mensaje, mRoomId, p.getParticipantId());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void actualizaRoom(Room room) {
+        if (room != null) {
+            mParticipants = room.getParticipants();
+        }
+    }
+
+    void mostrarErrorJuego() {
+        BaseGameUtils.makeSimpleDialog(this, "Oops! Ha ocurrido un error.");
+        finish();
+    }
+
+    void mostrarEsperandoARoom(Room room) {
+        final int MIN_PLAYERS = Integer.MAX_VALUE;
+        Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(
+                Partida.mGoogleApiClient, room, MIN_PLAYERS);
+        startActivityForResult(i, RC_WAITING_ROOM);
     }
 }
