@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -21,6 +22,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.google.android.gms.games.quest.Quests;
 import com.google.android.gms.games.request.GameRequest;
+import com.google.android.gms.games.request.OnRequestReceivedListener;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -205,6 +207,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     public void onConnected(Bundle connectionHint) {
         findViewById(R.id.sign_in_button).setVisibility(View.GONE);
         findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+        Games.Requests.registerRequestListener(mGoogleApiClient, mRequestListener);
     }
 
     @Override
@@ -277,4 +280,27 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
             mIncomingInvitationId = null;
         }
     }
+
+    private OnRequestReceivedListener mRequestListener = new OnRequestReceivedListener() {
+        @Override
+        public void onRequestReceived(GameRequest request) {
+            String requestStringResource;
+            switch (request.getType()) {
+                case GameRequest.TYPE_GIFT:
+                    requestStringResource = "Has recibido un regalo...";
+                    break;
+                case GameRequest.TYPE_WISH:
+                    requestStringResource = "Has recibido un deseo...";
+                    break;
+                default:
+                    return;
+            }
+            Toast.makeText(Menu.this, requestStringResource,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onRequestRemoved(String requestId) {
+        }
+    };
 }

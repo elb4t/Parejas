@@ -48,15 +48,15 @@
       <file leaf-file-name="Menu.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Menu.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="735">
-              <caret line="170" column="5" selection-start-line="170" selection-start-column="5" selection-end-line="170" selection-end-column="5" />
+            <state relative-caret-position="335">
+              <caret line="209" column="83" selection-start-line="209" selection-start-column="83" selection-end-line="209" selection-end-column="83" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#4107#4141#0" expanded="true" />
-                <element signature="e#5394#5430#0" expanded="true" />
-                <element signature="e#5493#5530#0" expanded="true" />
-                <element signature="e#5980#6013#0" expanded="true" />
-                <element signature="e#6283#6319#0" expanded="true" />
+                <element signature="e#4207#4241#0" expanded="true" />
+                <element signature="e#5494#5530#0" expanded="true" />
+                <element signature="e#5593#5630#0" expanded="true" />
+                <element signature="e#6080#6113#0" expanded="true" />
+                <element signature="e#6383#6419#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -3105,11 +3105,11 @@
           <caret line="43" column="80" selection-start-line="43" selection-start-column="80" selection-end-line="43" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4107#4141#0" expanded="true" />
-            <element signature="e#5394#5430#0" expanded="true" />
-            <element signature="e#5493#5530#0" expanded="true" />
-            <element signature="e#5980#6013#0" expanded="true" />
-            <element signature="e#6283#6319#0" expanded="true" />
+            <element signature="e#4207#4241#0" expanded="true" />
+            <element signature="e#5494#5530#0" expanded="true" />
+            <element signature="e#5593#5630#0" expanded="true" />
+            <element signature="e#6080#6113#0" expanded="true" />
+            <element signature="e#6383#6419#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3210,11 +3210,11 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4107#4141#0" expanded="true" />
-            <element signature="e#5394#5430#0" expanded="true" />
-            <element signature="e#5493#5530#0" expanded="true" />
-            <element signature="e#5980#6013#0" expanded="true" />
-            <element signature="e#6283#6319#0" expanded="true" />
+            <element signature="e#4207#4241#0" expanded="true" />
+            <element signature="e#5494#5530#0" expanded="true" />
+            <element signature="e#5593#5630#0" expanded="true" />
+            <element signature="e#6080#6113#0" expanded="true" />
+            <element signature="e#6383#6419#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3408,15 +3408,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Menu.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="170" column="5" selection-start-line="170" selection-start-column="5" selection-end-line="170" selection-end-column="5" />
+        <state relative-caret-position="335">
+          <caret line="209" column="83" selection-start-line="209" selection-start-column="83" selection-end-line="209" selection-end-column="83" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4107#4141#0" expanded="true" />
-            <element signature="e#5394#5430#0" expanded="true" />
-            <element signature="e#5493#5530#0" expanded="true" />
-            <element signature="e#5980#6013#0" expanded="true" />
-            <element signature="e#6283#6319#0" expanded="true" />
+            <element signature="e#4207#4241#0" expanded="true" />
+            <element signature="e#5494#5530#0" expanded="true" />
+            <element signature="e#5593#5630#0" expanded="true" />
+            <element signature="e#6080#6113#0" expanded="true" />
+            <element signature="e#6383#6419#0" expanded="true" />
           </folding>
         </state>
       </provider>
