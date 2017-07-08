@@ -131,15 +131,21 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
                 }
                 if ((Partida.puntosJ1 + Partida.puntosJ2) == (Partida.FILAS * Partida.COLUMNAS)) {
 //FIN JUEGO
-                    if (Partida.tipoPartida == "REAL") {
-                        int puntos;
-                        if (jugadorLocal == 1) {
-                            puntos = Partida.puntosJ1;
-                        } else {
-                            puntos = Partida.puntosJ2;
-                        }
-                        Games.Leaderboards.submitScore(Partida.mGoogleApiClient,getString(R.string. marcador_tiempoReal_id) ,puntos );
+                    // Añadir marcador
+                    int puntos;
+                    if (jugadorLocal == 1) {
+                        puntos = Partida.puntosJ1;
+                    } else {
+                        puntos = Partida.puntosJ2;
                     }
+                    if (Partida.tipoPartida == "REAL") {
+                        Games.Leaderboards.submitScore(Partida.mGoogleApiClient, getString(R.string.marcador_tiempoReal_id), puntos);
+                    }
+                    if (Partida.tipoPartida == "LOCAL") {
+                        Games.Leaderboards.submitScore(Partida.mGoogleApiClient, getString(R.string.marcador_partidaLocal_id), puntos);
+                    }
+                    // Fin Añadir marcador
+
                     ((TextView) findViewById(R.id.jugador)).setText("GANADOR JUGADOR " + (Partida.turno) + "");
                     if (Partida.tipoPartida == "TURNO") {
                         mTurnData.puntosJ1 = Partida.puntosJ1;

@@ -41,6 +41,8 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     String mIncomingInvitationId = null;
     final static int RC_SELECT_PLAYERS = 10000;
     private Button btnInvitar;
+    private Button btnMarcadores;
+    final static int REQUEST_LEADERBOARD = 100;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         btnPartidaEnTiempoReal = (Button) findViewById(R.id.btnPartidaEnTiempoReal);
         btnInvitar = (Button) findViewById(R.id.btnInvitar);
         btnPartidaPorTurnos = (Button) findViewById(R.id.btnPartidaPorTurnos);
+        btnMarcadores = (Button) findViewById(R.id.btnMarcadores);
         Partida.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -125,8 +128,14 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         startActivity(intent);
     }
 
+    public void btnMarcadores_Click(View v) {
+        startActivityForResult(
+                Games.Leaderboards.getAllLeaderboardsIntent(Partida.mGoogleApiClient), REQUEST_LEADERBOARD);
+    }
+
     private void nuevoJuego(int col, int fil) {
         Partida.turno = 1;
+        Partida.puntosJ1 = Partida.puntosJ2 = 0;
         Partida.FILAS = fil;
         Partida.COLUMNAS = col;
         Partida.casillas = new int[Partida.COLUMNAS][Partida.FILAS];

@@ -11,8 +11,8 @@ public class Partida {
     public static int COLUMNAS = -1;
     public static int[][] casillas;
     public static int turno;
-    public static int puntosJ1;
-    public static int puntosJ2;
+    public static int puntosJ1 = 0;
+    public static int puntosJ2 = 0;
     public static String tipoPartida="LOCAL";
     public static GoogleApiClient mGoogleApiClient;
 
