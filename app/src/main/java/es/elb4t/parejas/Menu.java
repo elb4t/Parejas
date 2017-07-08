@@ -122,6 +122,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
                 Games.TurnBasedMultiplayer.getSelectOpponentsIntent(Partida.mGoogleApiClient,
                         NUMERO_MINIMO_OPONENTES, NUMERO_MAXIMO_OPONENTES, true);
         startActivityForResult(intent, RC_SELECT_PLAYERS);
+        Games.Achievements.unlock(Partida.mGoogleApiClient, getString(R.string.logro_invitar));
     }
 
     public void btnPartidaPorTurnos_Click(View v) {
