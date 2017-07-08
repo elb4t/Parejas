@@ -3,6 +3,8 @@ package es.elb4t.parejas;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +20,7 @@ import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.google.android.gms.games.quest.Quests;
+import com.google.android.gms.games.request.GameRequest;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -48,6 +51,9 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     final static int REQUEST_ACHIEVEMENTS = 101;
     private Button btnMisiones;
     final static int REQUEST_QUESTS = 102;
+    private Button btnRegalos;
+    final static int SEND_GIFT_QUESTS = 103;
+    private static final int DEFAULT_LIFETIME = 7;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +71,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         btnMarcadores = (Button) findViewById(R.id.btnMarcadores);
         btnLogros = (Button) findViewById(R.id.btnLogros);
         btnMisiones = (Button) findViewById(R.id.btnMisiones);
+        btnRegalos = (Button) findViewById(R.id.btnRegalos);
         Partida.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -153,6 +160,14 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     public void btnMisiones_Click(View v) {
         startActivityForResult(Games.Quests.getQuestsIntent(Partida.mGoogleApiClient,
                 Quests.SELECT_ALL_QUESTS), REQUEST_QUESTS);
+    }
+
+    public void btnRegalos_Click(View v) {
+        Bitmap mGiftIcon;
+        mGiftIcon = BitmapFactory.decodeResource(getResources(),
+                R.drawable.ic_send_gift);
+        startActivityForResult(Games.Requests.getSendIntent(Partida.mGoogleApiClient
+                , GameRequest.TYPE_GIFT, "".getBytes(), DEFAULT_LIFETIME, mGiftIcon, "Esto es un regalo"), REQUEST_QUESTS);
     }
 
     private void nuevoJuego(int col, int fil) {
