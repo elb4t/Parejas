@@ -1,7 +1,9 @@
 package es.elb4t.parejas;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -19,8 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
@@ -28,6 +32,9 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
+import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotMetadata;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
@@ -48,7 +55,7 @@ import java.util.TimerTask;
 
 public class Juego extends Activity implements RoomStatusUpdateListener,
         RoomUpdateListener,
-        RealTimeMessageReceivedListener {
+        RealTimeMessageReceivedListener, OnTurnBasedMatchUpdateReceivedListener {
     private Drawable imagenOculta;
     private List<Drawable> imagenes;
     private Casilla primeraCasilla;
@@ -67,6 +74,12 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
     String mMyId = null;
     final static int RC_WAITING_ROOM = 10002;
     int jugadorLocal = 1;
+
+    final static int RC_LOOK_AT_MATCHES = 10001;
+    private AlertDialog mDialogoAlerta;
+    public TurnBasedMatch mMatch;
+    private Turno mTurnData;
+    private int turnoPartidaPorTurnos;
 
     String PartidaGuardadaNombre;
     private byte[] datosPartidaGuardada;
@@ -90,6 +103,9 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
             case "REAL":
                 iniciarPartidaEnTiempoReal();
                 break;
+            case "TURNO":
+                iniciarPartidaPorTurnos();
+                break;
         }
     }
 
@@ -102,8 +118,8 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
         }
 
         public void compruebaCasillas() {
-            if (Partida.casillas[segundaCasilla.x][segundaCasilla.y] == Partida.casillas[primeraCasilla.x][primeraCasilla.y]) {
-//ACIERTO
+            if (Partida.casillas[segundaCasilla.x][segundaCasilla.y] ==
+                    Partida.casillas[primeraCasilla.x][primeraCasilla.y]) { //ACIERTO
                 Partida.casillas[segundaCasilla.x][segundaCasilla.y] = 0;
                 Partida.casillas[primeraCasilla.x][primeraCasilla.y] = 0;
                 botones[primeraCasilla.x][primeraCasilla.y].setVisibility(View.INVISIBLE);
@@ -116,8 +132,19 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
                 if ((Partida.puntosJ1 + Partida.puntosJ2) == (Partida.FILAS * Partida.COLUMNAS)) {
 //FIN JUEGO
                     ((TextView) findViewById(R.id.jugador)).setText("GANADOR JUGADOR " + (Partida.turno) + "");
+                    if (Partida.tipoPartida == "TURNO") {
+                        mTurnData.puntosJ1 = Partida.puntosJ1;
+                        mTurnData.puntosJ2 = Partida.puntosJ2;
+                        mTurnData.turnoJugador = Partida.turno;
+                        mTurnData.casillas = Partida.casillas;
+                        Games.TurnBasedMultiplayer.finishMatch(Partida.mGoogleApiClient,
+                                mMatch.getMatchId());
+                        Toast.makeText(getApplicationContext(), "Fin de la partida.",
+                                Toast.LENGTH_LONG).show();
+                        mTurnData = null;
+                    }
                 }
-            } else {//FALLO
+            } else { //FALLO
                 segundaCasilla.boton.setBackgroundDrawable(imagenOculta);
                 primeraCasilla.boton.setBackgroundDrawable(imagenOculta);
                 if (Partida.turno == 1) {
@@ -125,10 +152,27 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
                 } else {
                     Partida.turno = 1;
                 }
+                if (Partida.tipoPartida == "TURNO") {
+                    mTurnData.puntosJ1 = Partida.puntosJ1;
+                    mTurnData.puntosJ2 = Partida.puntosJ2;
+                    mTurnData.turnoJugador = Partida.turno;
+                    mTurnData.casillas = Partida.casillas;
+                    String nextParticipantId = dameIdSiguienteJugador();
+                    Games.TurnBasedMultiplayer.takeTurn(Partida.mGoogleApiClient,
+                            mMatch.getMatchId(),
+                            mTurnData.persist(), nextParticipantId).setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+                        @Override
+                        public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+                        }
+                    });
+                    Toast.makeText(getApplicationContext(), "Fin de tu turno.", Toast.LENGTH_LONG).show();
+                    mTurnData = null;
+                }
             }
             primeraCasilla = null;
             segundaCasilla = null;
         }
+
     }
 
     private void cargarImagenes() {
@@ -190,6 +234,7 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
                 }
             }
         }
+
     }
 
     private void descubrirCasilla(int x, int y) {
@@ -289,6 +334,15 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
                     mostrarTablero();
                 } else {
                     finish();
+                }
+                break;
+            case RC_LOOK_AT_MATCHES:
+                if (responseCode != Activity.RESULT_OK) {
+                    return;
+                }
+                TurnBasedMatch match = intent.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+                if (match != null) {
+                    gestionarPartidaTurno(match);
                 }
                 break;
         }
@@ -604,5 +658,143 @@ public class Juego extends Activity implements RoomStatusUpdateListener,
         Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(
                 Partida.mGoogleApiClient, room, MIN_PLAYERS);
         startActivityForResult(i, RC_WAITING_ROOM);
+    }
+
+    @Override
+    public void onTurnBasedMatchReceived(TurnBasedMatch match) {
+    }
+
+    @Override
+    public void onTurnBasedMatchRemoved(String matchId) {
+    }
+
+    public void iniciarPartidaPorTurnos() {
+        Intent intent = Games.TurnBasedMultiplayer
+                .getInboxIntent(Partida.mGoogleApiClient);
+        startActivityForResult(intent, RC_LOOK_AT_MATCHES);
+    }
+
+    public void gestionarPartidaTurno(TurnBasedMatch match) {
+        mMatch = match;
+        int status = match.getStatus();
+        int turnStatus = match.getTurnStatus();
+        switch (status) {
+            case TurnBasedMatch.MATCH_STATUS_CANCELED:
+                mostrarAdvertencia("Cancelada!", "Este partida ha sido cancelada!");
+                return;
+            case TurnBasedMatch.MATCH_STATUS_EXPIRED:
+                mostrarAdvertencia("Expirada!", "Esta partida ha expirado!");
+                return;
+            case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
+                mostrarAdvertencia("Esperando a jugadores aleatorios...", "Todavía estamos esperando a jugadores aleatorios.");
+                return;
+            case TurnBasedMatch.MATCH_STATUS_COMPLETE:
+                if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
+                    mostrarAdvertencia("Completada!", "Esta partida ha finalizado! No hay nada que hacer");
+                    break;
+                }
+        }
+        switch (turnStatus) {
+            case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
+                mTurnData = Turno.unpersist(mMatch.getData());
+                if (match.getData() == null) {
+                    inicializarPartidaPorTurnos(mMatch);
+                }
+                mostrarPartidaPorTurnos(mMatch);
+                return;
+            case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
+                mostrarAdvertencia("Turno...", "No es tu turno.");
+                break;
+            case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
+                mostrarAdvertencia("Esperando!",
+                        "Esperando a que respondan a las invitaciones!");
+        }
+        mTurnData = null;
+    }
+
+    public void mostrarAdvertencia(String title, String message) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(title).setMessage(message);
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+        mDialogoAlerta = alertDialogBuilder.create();
+        mDialogoAlerta.show();
+    }
+
+    public void inicializarPartidaPorTurnos(TurnBasedMatch match) {
+        mTurnData = new Turno();
+        mTurnData.nivel = 1;
+        mTurnData.filas = 4;
+        mTurnData.columnas = 4;
+        mTurnData.casillas = new int[mTurnData.columnas][mTurnData.filas];
+        mTurnData.puntosJ1 = 0;
+        mTurnData.puntosJ2 = 0;
+        mTurnData.turnoJugador = 1;
+        try {
+            int size = mTurnData.filas * mTurnData.columnas;
+            ArrayList<Integer> list = new ArrayList<Integer>();
+            for (int j = 0; j < size; j++) {
+                list.add(new Integer(j));
+            }
+            Random r = new Random();
+            for (int i = size - 1; i >= 0; i--) {
+                int t = 0;
+                if (i > 0) {
+                    t = r.nextInt(i);
+                }
+                t = list.remove(t).intValue();
+                mTurnData.casillas[i % mTurnData.filas][i / mTurnData.columnas] = 1 + (t % (size / 2));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mMatch = match;
+        String playerId = Games.Players.getCurrentPlayerId(Partida.mGoogleApiClient);
+        String myParticipantId = mMatch.getParticipantId(playerId);
+        Games.TurnBasedMultiplayer.takeTurn(Partida.mGoogleApiClient, match.getMatchId(),
+                mTurnData.persist(), myParticipantId).setResultCallback(
+                new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+                    @Override
+                    public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+                    }
+                });
+    }
+
+    public void mostrarPartidaPorTurnos(TurnBasedMatch match) {
+        mTurnData.unpersist(match.getData());
+        Partida.FILAS = mTurnData.filas;
+        Partida.COLUMNAS = mTurnData.columnas;
+        Partida.puntosJ1 = mTurnData.puntosJ1;
+        Partida.puntosJ2 = mTurnData.puntosJ2;
+        Partida.turno = mTurnData.turnoJugador;
+        turnoPartidaPorTurnos = mTurnData.turnoJugador;
+        Partida.casillas = new int[mTurnData.columnas][mTurnData.filas];
+        Partida.casillas = mTurnData.casillas;
+        mostrarTablero();
+    }
+
+    public String dameIdSiguienteJugador() {
+        String playerId = Games.Players.getCurrentPlayerId(Partida.mGoogleApiClient);
+        String myParticipantId = mMatch.getParticipantId(playerId);
+        ArrayList<String> participantIds = mMatch.getParticipantIds();
+        int desiredIndex = -1;
+        for (int i = 0; i < participantIds.size(); i++) {
+            if (participantIds.get(i).equals(myParticipantId)) {
+                desiredIndex = i + 1;
+            }
+        }
+        if (desiredIndex < participantIds.size()) {
+            return participantIds.get(desiredIndex);
+        }
+        if (mMatch.getAvailableAutoMatchSlots() <= 0) {
+            return participantIds.get(0);
+        } else {
+            return null;
+        }
     }
 }
