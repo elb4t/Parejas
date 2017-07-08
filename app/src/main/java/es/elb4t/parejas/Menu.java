@@ -81,6 +81,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         nuevoJuego(4, 4);
         Intent intent = new Intent(this, Juego.class);
         startActivity(intent);
+        Games.Events.increment(Partida.mGoogleApiClient, getString(R.string.evento_offline), 1);
     }
 
     View.OnClickListener btnConectar_Click = new View.OnClickListener() {
@@ -115,6 +116,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         Intent intent = new Intent(this, Juego.class);
         startActivity(intent);
         Games.Achievements.increment(Partida.mGoogleApiClient, getString(R.string.logro_tiempoReal), 1);
+        Games.Events.increment(Partida.mGoogleApiClient, getString(R.string.evento_tiempoReal), 1);
     }
 
     public void btnInvitar_Click(View v) {
@@ -131,6 +133,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         nuevoJuego(4, 4);
         Intent intent = new Intent(this, Juego.class);
         startActivity(intent);
+        Games.Events.increment(Partida.mGoogleApiClient, getString(R.string.evento_porTurnos), 1);
     }
 
     public void btnMarcadores_Click(View v) {

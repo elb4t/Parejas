@@ -5,4 +5,7 @@
     <string name="marcador_partidaLocal_id">CgkIjo6Co6AIEAIQAg</string>
     <string name="logro_invitar">CgkIjo6Co6AIEAIQAw</string>
     <string name="logro_tiempoReal">CgkIjo6Co6AIEAIQBA</string>
+    <string name="evento_offline">CgkIjo6Co6AIEAIQBQ</string>
+    <string name="evento_tiempoReal">CgkIjo6Co6AIEAIQBg</string>
+    <string name="evento_porTurnos">CgkIjo6Co6AIEAIQBw</string>
 </resources>
