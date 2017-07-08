@@ -17,6 +17,7 @@ import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
+import com.google.android.gms.games.quest.Quests;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -45,6 +46,8 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     final static int REQUEST_LEADERBOARD = 100;
     private Button btnLogros;
     final static int REQUEST_ACHIEVEMENTS = 101;
+    private Button btnMisiones;
+    final static int REQUEST_QUESTS = 102;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
         btnPartidaPorTurnos = (Button) findViewById(R.id.btnPartidaPorTurnos);
         btnMarcadores = (Button) findViewById(R.id.btnMarcadores);
         btnLogros = (Button) findViewById(R.id.btnLogros);
+        btnMisiones = (Button) findViewById(R.id.btnMisiones);
         Partida.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -144,6 +148,11 @@ public class Menu extends Activity implements GoogleApiClient.ConnectionCallback
     public void btnLogros_Click(View v) {
         startActivityForResult(Games.Achievements.getAchievementsIntent(
                 Partida.mGoogleApiClient), REQUEST_ACHIEVEMENTS);
+    }
+
+    public void btnMisiones_Click(View v) {
+        startActivityForResult(Games.Quests.getQuestsIntent(Partida.mGoogleApiClient,
+                Quests.SELECT_ALL_QUESTS), REQUEST_QUESTS);
     }
 
     private void nuevoJuego(int col, int fil) {

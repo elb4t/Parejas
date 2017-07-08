@@ -48,15 +48,15 @@
       <file leaf-file-name="Menu.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Menu.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="810">
-              <caret line="135" column="13" selection-start-line="135" selection-start-column="13" selection-end-line="135" selection-end-column="13" />
+            <state relative-caret-position="585">
+              <caret line="155" column="5" selection-start-line="155" selection-start-column="5" selection-end-line="155" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3603#3637#0" expanded="true" />
-                <element signature="e#4890#4926#0" expanded="true" />
-                <element signature="e#4989#5026#0" expanded="true" />
-                <element signature="e#5476#5509#0" expanded="true" />
-                <element signature="e#5779#5815#0" expanded="true" />
+                <element signature="e#3791#3825#0" expanded="true" />
+                <element signature="e#5078#5114#0" expanded="true" />
+                <element signature="e#5177#5214#0" expanded="true" />
+                <element signature="e#5664#5697#0" expanded="true" />
+                <element signature="e#5967#6003#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -78,8 +78,8 @@
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="711">
-              <caret line="58" column="32" selection-start-line="58" selection-start-column="32" selection-end-line="58" selection-end-column="32" />
+            <state relative-caret-position="651">
+              <caret line="65" column="34" selection-start-line="65" selection-start-column="34" selection-end-line="65" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -2486,8 +2486,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Turno.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Partida.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Juego.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/ids.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Menu.java" />
       </list>
     </option>
@@ -3105,11 +3105,11 @@
           <caret line="43" column="80" selection-start-line="43" selection-start-column="80" selection-end-line="43" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3603#3637#0" expanded="true" />
-            <element signature="e#4890#4926#0" expanded="true" />
-            <element signature="e#4989#5026#0" expanded="true" />
-            <element signature="e#5476#5509#0" expanded="true" />
-            <element signature="e#5779#5815#0" expanded="true" />
+            <element signature="e#3791#3825#0" expanded="true" />
+            <element signature="e#5078#5114#0" expanded="true" />
+            <element signature="e#5177#5214#0" expanded="true" />
+            <element signature="e#5664#5697#0" expanded="true" />
+            <element signature="e#5967#6003#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3210,11 +3210,11 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3603#3637#0" expanded="true" />
-            <element signature="e#4890#4926#0" expanded="true" />
-            <element signature="e#4989#5026#0" expanded="true" />
-            <element signature="e#5476#5509#0" expanded="true" />
-            <element signature="e#5779#5815#0" expanded="true" />
+            <element signature="e#3791#3825#0" expanded="true" />
+            <element signature="e#5078#5114#0" expanded="true" />
+            <element signature="e#5177#5214#0" expanded="true" />
+            <element signature="e#5664#5697#0" expanded="true" />
+            <element signature="e#5967#6003#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3387,17 +3387,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/menu.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="711">
-          <caret line="58" column="32" selection-start-line="58" selection-start-column="32" selection-end-line="58" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/ids.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -3406,17 +3395,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/menu.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="651">
+          <caret line="65" column="34" selection-start-line="65" selection-start-column="34" selection-end-line="65" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/es/elb4t/parejas/Menu.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="135" column="13" selection-start-line="135" selection-start-column="13" selection-end-line="135" selection-end-column="13" />
+        <state relative-caret-position="585">
+          <caret line="155" column="5" selection-start-line="155" selection-start-column="5" selection-end-line="155" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3603#3637#0" expanded="true" />
-            <element signature="e#4890#4926#0" expanded="true" />
-            <element signature="e#4989#5026#0" expanded="true" />
-            <element signature="e#5476#5509#0" expanded="true" />
-            <element signature="e#5779#5815#0" expanded="true" />
+            <element signature="e#3791#3825#0" expanded="true" />
+            <element signature="e#5078#5114#0" expanded="true" />
+            <element signature="e#5177#5214#0" expanded="true" />
+            <element signature="e#5664#5697#0" expanded="true" />
+            <element signature="e#5967#6003#0" expanded="true" />
           </folding>
         </state>
       </provider>
